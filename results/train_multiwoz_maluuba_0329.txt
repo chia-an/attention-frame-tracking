@@ -1,0 +1,62 @@
+root@afa32b085c28:/work/src-git# python3 train_multiwoz.py
+# Epoch 1
+50182it [23:55, 34.96it/s]
+12529it [01:14, 168.75it/s]
+train loss = 229744.72956975613
+valid loss = 59078.93588132659
+Save checkpoint multiwoz-0329-140843.pt
+# Epoch 2
+50182it [28:04, 29.79it/s]^[^[
+12529it [01:15, 166.71it/s]
+train loss = 272380.5588049397
+valid loss = 68820.23006125963
+Save checkpoint multiwoz-0329-143802.pt
+# Epoch 3
+50182it [24:25, 34.25it/s]
+12529it [01:12, 172.04it/s]
+train loss = 285762.1930710283
+valid loss = 77731.13647851872
+Save checkpoint multiwoz-0329-150340.pt
+# Epoch 4
+50182it [23:57, 34.91it/s]
+12529it [01:12, 171.67it/s]
+train loss = 307739.54562079057
+valid loss = 84603.89863546292
+Save checkpoint multiwoz-0329-152851.pt
+# Epoch 5
+50182it [23:53, 35.00it/s]
+12529it [01:12, 171.84it/s]
+train loss = 312000.5952562715
+valid loss = 86639.49514308563
+Save checkpoint multiwoz-0329-155358.pt
+# Epoch 6
+50182it [24:59, 33.47it/s]
+12529it [01:29, 139.51it/s]
+train loss = 293275.1338274431
+valid loss = 90927.67796065433
+Save checkpoint multiwoz-0329-162027.pt
+# Epoch 7
+50182it [23:57, 34.90it/s]
+12529it [01:12, 172.25it/s]
+train loss = 309964.2077769218
+valid loss = 97737.73564177792
+Save checkpoint multiwoz-0329-164538.pt
+# Epoch 8
+50182it [23:58, 34.89it/s]^N
+12529it [01:13, 171.57it/s]
+train loss = 335763.32193616574
+valid loss = 105830.23338764197
+Save checkpoint multiwoz-0329-171050.pt
+# Epoch 9
+50182it [24:23, 34.30it/s]^N
+12529it [01:14, 169.21it/s]
+train loss = 350482.09986153303
+valid loss = 142262.43690956707
+Save checkpoint multiwoz-0329-173627.pt
+# Epoch 10
+50182it [24:53, 33.61it/s]
+12529it [01:12, 172.08it/s]
+train loss = 349594.55454846524
+valid loss = 133921.00524354036
+Save checkpoint multiwoz-0329-180233.pt
+

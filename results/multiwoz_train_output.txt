@@ -1,0 +1,85 @@
+root@2891b9b3a443:/work/src-git/multiwoz# python train.py --max_epochs         20 --batch_size         64 --lr_rate            0.005 --clip               5.0 --l2_norm            0.00001 --dropout            0.0 --optim              'Adam' --emb_size           50 --use_attn           'True' --hid_size_enc       150 --hid_size_pol       150 --hid_size_dec       150 --cell_type          'lstm'
+/usr/local/lib/python2.7/dist-packages/torch/nn/_reduction.py:49: UserWarning: size_average and reduce args will be deprecated, please use reduction='mean' instead.
+  warnings.warn(warning.format(ret))
+Model has 574400  parameters.
+TIME: 351.838439941
+Time since 5m 51s  (Epoch:1 5%) Loss: 0.1999, Loss act: 0.0000, Grad: 0.0254
+Current Valid LOSS: 1.61447654694
+Saving parameters..
+TIME: 351.626837015
+Time since 12m 7s  (Epoch:2 10%) Loss: 0.1552, Loss act: 0.0000, Grad: 0.0218
+Current Valid LOSS: 1.52139919293
+Saving parameters..
+TIME: 355.750281096
+Time since 18m 28s  (Epoch:3 15%) Loss: 0.1477, Loss act: 0.0000, Grad: 0.0207
+Current Valid LOSS: 1.47953064924
+Saving parameters..
+TIME: 367.828485012
+Time since 25m 3s  (Epoch:4 20%) Loss: 0.1435, Loss act: 0.0000, Grad: 0.0201
+Current Valid LOSS: 1.45268922061
+Saving parameters..
+TIME: 366.937654972
+Time since 31m 36s  (Epoch:5 25%) Loss: 0.1410, Loss act: 0.0000, Grad: 0.0198
+Current Valid LOSS: 1.44659518898
+Saving parameters..
+TIME: 365.60097909
+Time since 38m 9s  (Epoch:6 30%) Loss: 0.1390, Loss act: 0.0000, Grad: 0.0196
+Current Valid LOSS: 1.43173838776
+Saving parameters..
+TIME: 366.829742908
+Time since 44m 42s  (Epoch:7 35%) Loss: 0.1379, Loss act: 0.0000, Grad: 0.0196
+Current Valid LOSS: 1.42608018428
+Saving parameters..
+TIME: 367.501363039
+Time since 51m 17s  (Epoch:8 40%) Loss: 0.1364, Loss act: 0.0000, Grad: 0.0194
+Current Valid LOSS: 1.41977757555
+Saving parameters..
+TIME: 367.742626905
+Time since 57m 51s  (Epoch:9 45%) Loss: 0.1356, Loss act: 0.0000, Grad: 0.0195
+Current Valid LOSS: 1.41168418345
+Saving parameters..
+TIME: 367.726505995
+Time since 64m 25s  (Epoch:10 50%) Loss: 0.1345, Loss act: 0.0000, Grad: 0.0194
+Current Valid LOSS: 1.41716677457
+Saving parameters..
+TIME: 366.830757141
+Time since 70m 58s  (Epoch:11 55%) Loss: 0.1337, Loss act: 0.0000, Grad: 0.0194
+Current Valid LOSS: 1.41211686075
+Saving parameters..
+TIME: 341.608798027
+Time since 77m 6s  (Epoch:12 60%) Loss: 0.1333, Loss act: 0.0000, Grad: 0.0195
+Current Valid LOSS: 1.40574221772
+Saving parameters..
+TIME: 293.781692028
+Time since 82m 22s  (Epoch:13 65%) Loss: 0.1331, Loss act: 0.0000, Grad: 0.0196
+Current Valid LOSS: 1.40297000659
+Saving parameters..
+TIME: 291.244277954
+Time since 87m 36s  (Epoch:14 70%) Loss: 0.1320, Loss act: 0.0000, Grad: 0.0195
+Current Valid LOSS: 1.40427853572
+Saving parameters..
+TIME: 291.159303904
+Time since 92m 50s  (Epoch:15 75%) Loss: 0.1315, Loss act: 0.0000, Grad: 0.0195
+Current Valid LOSS: 1.40023366317
+Saving parameters..
+TIME: 291.762871981
+Time since 98m 5s  (Epoch:16 80%) Loss: 0.1314, Loss act: 0.0000, Grad: 0.0196
+Current Valid LOSS: 1.39689391485
+Saving parameters..
+TIME: 291.489923
+Time since 103m 19s  (Epoch:17 85%) Loss: 0.1310, Loss act: 0.0000, Grad: 0.0196
+Current Valid LOSS: 1.40119594246
+Saving parameters..
+TIME: 291.949257135
+Time since 108m 34s  (Epoch:18 90%) Loss: 0.1307, Loss act: 0.0000, Grad: 0.0197
+Current Valid LOSS: 1.40336018065
+Saving parameters..
+TIME: 291.608324051
+Time since 113m 48s  (Epoch:19 95%) Loss: 0.1303, Loss act: 0.0000, Grad: 0.0197
+Current Valid LOSS: 1.3985358609
+Saving parameters..
+TIME: 291.19408989
+Time since 119m 2s  (Epoch:20 100%) Loss: 0.1300, Loss act: 0.0000, Grad: 0.0197
+Current Valid LOSS: 1.39347193992
+Saving parameters..
+
