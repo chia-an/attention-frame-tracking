@@ -33,26 +33,14 @@ class EncoderText(nn.Module):
             raise NotImplementedError
 
         elif self.embed_type.startswith('bert'):
-            # self.precomputed = ['last-layer']
-            # self.bert_layer = bert_layer
-            # if bert_layer in self.precomputed:
-            #     import pickle
-            #     with open('', 'rb') as f_embed:
-            #         self.bert_embed = pickle.load(f_embed)
-
             self.bert_embedding = bert_embedding
 
             self.embed_dim_text = embed_dim_text
-            # self.embed_dim_text = self.bert.config.hidden_size
 
             if bert_embedding is None:
                 from pytorch_pretrained_bert import BertModel
 
-                # self.bert = BertModel.from_pretrained(self.embed_type).to('cuda:1')
                 self.bert = BertModel.from_pretrained(self.embed_type)
-
-                # for p in self.bert.parameters():
-                #     p.requires_grad = False
 
                 assert self.bert.config.hidden_size == 768, \
                        'bert.config.hidden_size = {}'.format(
@@ -100,10 +88,6 @@ class EncoderText(nn.Module):
             if self.bert_embedding is not None:
                 output = self.bert_embedding[str(sent.tolist())]
             else:
-                # # size = [1, *]
-                # device = sent[0].device
-                # sent = torch.tensor(sent, device=device).unsqueeze(0)
-
                 # list[size[batch_size, seq_len, hidden_size]]
                 output, _ = self.bert(sent)
 
@@ -151,7 +135,6 @@ class EncoderASV(nn.Module):
             bidirectional=True
         )
 
-        # NOTE: non-linear?
         proj_in_dim = 0
         if self.with_utterance:
             proj_in_dim += self.embed_dim_text
@@ -159,18 +142,12 @@ class EncoderASV(nn.Module):
             proj_in_dim += self.rnn_hidden_size * 2
         if self.rnn_output:
             proj_in_dim += self.rnn_hidden_size * 6
-        # self.embed_dim_act + self.embed_dim_slot + self.embed_dim_text * 2, 
-        # self.rnn_hidden_size * 6 + self.embed_dim_text,
-        # self.rnn_hidden_size * 6,
-        # self.rnn_hidden_size * 2  + self.embed_dim_text,
-        # self.rnn_hidden_size * 2,
 
         self.proj = nn.Linear(
             proj_in_dim,
             self.embed_dim,
             bias=False
         )
-        # self.activation = nn.Tanh()
 
     def forward(self, asvs, embed_sent):
         """
@@ -180,11 +157,6 @@ class EncoderASV(nn.Module):
 
         NOTE: assume batch = 1.
         """
-        # size = [embed_dim_text]
-        # embed_sent = self.encoder_text(sent)
-
-        # TODO: one batch per asvs?
-        # NOTE: take output instead of hidden
         embeddings = []
         for asv in asvs:
             # size = [embed_dim_act]
@@ -212,29 +184,11 @@ class EncoderASV(nn.Module):
                 embedding = torch.cat([embedding, embed_asv.view(-1)])
 
             embeddings.append(embedding)
-            
-            # # size = [3 * 2 * hidden_size + embed_dim_text]
-            # embeddings.append(torch.cat([embed_asv.view(-1), embed_sent]))
-            # # size = [3 * 2 * hidden_size]
-            # embeddings.append(embed_asv.view(-1))
 
-            # # size = [2 * hidden_size + embed_dim_text]
-            # embeddings.append(torch.cat([hidden.view(-1), embed_sent]))
-            # # size = [2 * hidden_size]
-            # embeddings.append(hidden.view(-1))
-
-            # # size = [embed_dim_act + embed_dim_slot + embed_dim_text * 2]
-            # embeddings.append(torch.cat([act, slot, value, embed_sent]))
-
-        # # size = [n_asvs, embed_dim_act + embed_dim_slot + embed_dim_text * 2]
-        # # size = [n_asvs, 3 * 2 * hidden_size + embed_dim_text]
-        # size = [n_asvs, 2 * hidden_size + embed_dim_text]
         embed_asvs = torch.stack(embeddings)
 
-        # NOTE: what to do after concat?
         # size = [n_asvs, embed_dim]
         output = self.proj(embed_asvs)
-        # output = self.activation(output)
 
         return output
 
@@ -266,7 +220,6 @@ class EncoderFrame(nn.Module):
         )
 
         self.proj = nn.Linear(
-            # self.embed_dim_slot + self.embed_dim_text,
             self.rnn_hidden_size * 2,
             self.embed_dim,
             bias=False
@@ -281,7 +234,6 @@ class EncoderFrame(nn.Module):
             with_attention = True, list[size[n_svs, embed_dim]]
             with_attention = False, list[size[embed_dim]]
         """
-        # TODO: One frame per batch?
         embed_frames = []
         for frame in frames:
             embed_frame = []
@@ -319,9 +271,6 @@ class EncoderFrame(nn.Module):
 
 
 class AttFrame(nn.Module):
-    """
-    Modified from torchnlp.nn.attention.
-    """
     def __init__(self, dim_asv,
                        dim_sv,
                        dim_proj_v,
@@ -370,25 +319,6 @@ class AttFrame(nn.Module):
 
         self.softmax = nn.Softmax(dim=-1)
 
-        # self.att_weight = nn.Linear(32, 1, bias=False)
-
-        # self.proj_v = nn.Linear(
-        #     self.dim_sv,
-        #     self.dim_proj_v,
-        # )
-        # self.activation = nn.Tanh()
-
-    def forward_position(self, frame):
-        """
-        frame: size[n_svs, dim_sv]
-
-        output: size[dim_sv], attention features.
-        attention_weights: None.
-        """
-        output = self.att_weight(frame.transpose(0, 1))
-
-        return output, None
-
     def forward(self, asvs, frame):
         """
         asvs: size[n_asvs, dim_asv]
@@ -397,7 +327,7 @@ class AttFrame(nn.Module):
         output: size[n_asvs, dim_proj_v], attention features.
         attention_weights: size[n_asvs, n_svs].
 
-        NOTE: batch = 1 for now.
+        NOTE: batch = 1.
         NOTE: Luong, dot product
         https://lilianweng.github.io/lil-log/2018/06/24/attention-attention.html
         """
@@ -407,7 +337,6 @@ class AttFrame(nn.Module):
                    'asvs.size() = {}, frame.size() = {}'.format(
                        asvs.size(), frame.size())
 
-            # NOTE: what is contiguous()?
             # size = [n_asvs, n_svs]
             attention_scores = torch.matmul(
                 asvs, frame.transpose(0, 1).contiguous())
@@ -465,47 +394,8 @@ class AttFrame(nn.Module):
         # size = [n_asvs, n_svs]
         attention_weights = self.softmax(attention_scores)
 
-        # NOTE: non-linear after linear combination
         # size = [n_asvs, dim_sv]
         output = torch.matmul(attention_weights, frame)
-
-        return output, attention_weights
-
-    def forward_general(self, asvs, frame):
-        """
-        asvs: size[n_asvs, dim_asv]
-        frame: size[n_svs, dim_sv]
-
-        output: size[n_asvs, dim_proj_v], attention features.
-        attention_weights: size[n_asvs, n_svs].
-
-        NOTE: batch = 1 for now.
-        NOTE: Luong, general
-        https://lilianweng.github.io/lil-log/2018/06/24/attention-attention.html
-        """
-
-        # n_asvs, dim_asv = asvs.size()
-        # n_svs = frame.size(0)
-
-        # NOTE: separate proj_q into proj_q and proj_k?
-        # size = [n_asvs, dim_sv]
-        asvs = self.proj_q(asvs)
-
-        # NOTE: what is contiguous()?
-        # size = [n_asvs, n_svs]
-        attention_scores = torch.matmul(
-            asvs, frame.transpose(0, 1).contiguous())
-
-        # size = [n_asvs, n_svs]
-        attention_weights = self.softmax(attention_scores)
-
-        # NOTE: non-linear after linear combination
-        # size = [n_asvs, dim_sv]
-        output = torch.matmul(attention_weights, frame)
-
-        # size = [n_asvs, dim_proj_v]
-        # output = self.proj_v(output)
-        # output = self.activation(output)
 
         return output, attention_weights
 
@@ -601,7 +491,7 @@ class Model(nn.Module):
         input: (sent, asvs, frames, active_frame, new_frames)
         output: size[n_asvs, n_frames]
 
-        No batching, one input per turn.
+        No batching, one turn per batch.
         """
         sent, asvs, frames, active_frame, new_frames = input
 
@@ -624,8 +514,6 @@ class Model(nn.Module):
                         [w.to(self.device) for w in v])
                        for s, v in frame]
                       for frame in frames]
-        # active_frame.to(self.device)
-        # new_frames.to(self.device)
 
         # size = [embed_dim_text]
         embed_sent = self.encoder_text(sent)
@@ -646,12 +534,6 @@ class Model(nn.Module):
 
                 # size = [n_asvs]
                 sim = (embed_att_frame * embed_asvs).sum(dim=-1)
-
-                # # No query attention
-                # # size = [embed_dim]
-                # embed_att_frame, _ = self.attention(embed_frame)
-                # # size = [n_asvs]
-                # sim = torch.matmul(embed_asvs, embed_att_frame).view(-1)
             else:
                 # No attention
                 sim = torch.matmul(embed_asvs, embed_frame)
@@ -674,7 +556,6 @@ class Model(nn.Module):
 
         output = self.forward(input)
         self.loss = self.criterion(output, fs.view(-1))
-        # preds = output.argmax(dim=1)
 
         if train:
             self.loss.backward()
