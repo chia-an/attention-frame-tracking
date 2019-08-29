@@ -13,22 +13,6 @@ event_dir = Path(__file__).parent / '../runs'
 
 
 def init_model(model_class, **kwargs):
-    # # Copy the model file as a backup.
-    # from importlib import import_module
-    # from shutil import copy
-
-    # model_file_path = inspect.getfile(model_class)
-    # model_file_name = Path(model_file_path).name
-
-    # # copy(model_class_path, str(event_dir / run_id / model_file_name))
-    # test_dir = Path(__file__).parent / '../test'
-    # copy(model_file_path, str(test_dir / model_file_name))
-
-    # m = import_module('...test.test.{}'.format(Path(model_file_name).stem),
-    #                   package=__name__)
-
-    # return
-
     model = model_class(**kwargs)
     with open(inspect.getfile(model.__class__), 'r') as f_code:
         code = f_code.read()
@@ -87,11 +71,8 @@ def train_hook(run_id,
                valid_loaders,
                metrics={},
                main_valid_metric=('', ''),
-               model_filename_prefix='',
-               train_id_prefix='',
                save=True,
                save_best_only=False):
-
     tqdm_bar_format = '{l_bar}{r_bar}'
 
     train_iter_writer = SummaryWriter(
@@ -305,8 +286,3 @@ def eval_hook(model,
         logger.info('eval/{} = {}'.format(metric_name, value))
 
     return outputs
-
-
-if __name__ == '__main__':
-    pass
-
