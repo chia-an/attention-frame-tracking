@@ -53,38 +53,6 @@ logger.addHandler(ch)
 action_options = ['scratch', 'pretrain', 'finetune']
 
 
-def init_arg_parser():
-    parser = argparse.ArgumentParser()
-
-    parser.add_argument(
-        '--model_config', default='', type=str,
-        help='a json config file to initialize a model, '
-             'cannot use with --checkpoint')
-    parser.add_argument(
-        '--checkpoint', default='', type=str,
-        help='a PyTorch checkpoint, cannot use with --model_config')
-
-    parser.add_argument(
-        '--action', type=str, required=True,
-        help='train or pre-train or fine-tune')
-
-    # parser.add_argument(
-    #     '--data', type=str, required=True,
-    #     help='the dataset to be used: frames or multiwoz')
-
-    parser.add_argument(
-        '--device', type=str, required=True,
-        help='torch device(s) to be used')
-    parser.add_argument(
-        '--n_epochs', type=int, required=True,
-        help='number of training epochs')
-    parser.add_argument(
-        '--dry', default=True, type=bool,
-        help='use dry run to test and debug, small dataset and not save')
-
-    return parser
-
-
 def load_combined_dicts():
     f_word_to_index, f_index_to_word, \
     f_tri_to_index, f_index_to_tri, \
@@ -129,16 +97,16 @@ def train(dicts_config,
           save=True,
           save_best_only=True):
     """
-    X_config [dict]: each (key, value) corresponds to a (class_name, args)
-    valid_datasets_config [dict]: keys are names of valid set and 
-                                  values are configs.
-    """
-    # # Make things deterministic
-    # random.seed(0)
-    # torch.manual_seed(0)
-    # torch.backends.cudnn.benchmark = False
-    # torch.backends.cudnn.deterministic = True
+    Initialise everything for training and call trainhook.
 
+    The config for a class is represented as {CLASSNAME: KWARGS}, where KWARGS
+    is a dictionary.
+
+    Most configs in the argument is a single config for one class.
+    train_datasets_config is a list of configs for train datasets.
+        valid_datasets_config [dict]: keys are names of valid set and
+    values are configs.
+    """
     # Initialize run_id.
     run_id = '{}-{}'.format(
         run_id_prefix, datetime.datetime.now().strftime('%m%d-%H%M%S'))
@@ -178,23 +146,6 @@ def train(dicts_config,
     logger.info('\nRun id = {}'.format(run_id))
     logger.info('\n===== Configs =====')
     logger.info(json.dumps(configs, indent=2, sort_keys=True))
-    # logger.info(pformat(configs))
-    # logger.info('dicts config = {}'.format(pformat(dicts_config)))
-    # logger.info('model config = {}'.format(pformat(model_config)))
-    # logger.info('optim config = {}'.format(pformat(optim_config)))
-    # logger.info('train datasets config = {}'.format(
-    #     pformat(train_datasets_config)))
-    # logger.info('train loader kwargs = {}'.format(
-    #     pformat(train_loader_kwargs)))
-    # logger.info('valid datasets config = {}'.format(
-    #     pformat(valid_datasets_config)))
-    # logger.info('device config = {} (may not be used)'.format(
-    #     pformat(device_config)))
-    # logger.info('metrics config = {}'.format(pformat(metrics_config)))
-    # logger.info('main valid metric = {}'.format(main_valid_metric))
-    # logger.info('n_epochs = {}'.format(n_epochs))
-    # logger.info('save = {}'.format(save))
-    # logger.info('save best only = {}'.format(save_best_only))
 
     # Load dicts for model_args and datasets.
     assert len(dicts_config) == 1, dicts_config
@@ -212,7 +163,6 @@ def train(dicts_config,
     slot_to_index, index_to_slot = dicts
 
     # Initialize torch device.
-    # TODO: set model.device.
     assert len(device_config) == 1, device_config
     for name, args in device_config.items():
         device = torch.device(name)
@@ -223,10 +173,6 @@ def train(dicts_config,
         if name == 'checkpoint':
             # args is checkpoint name.
             model, code = load_checkpoint(args)
-
-            # NOTE: Dirty hack
-            # model.optimizer = torch.optim.Adam(
-            #     model.parameters(), lr=1e-4, weight_decay=1e-4)
         else:
             args['n_acts'] = len(act_to_index) + 1
             args['n_slots'] = len(slot_to_index) + 1
@@ -242,8 +188,6 @@ def train(dicts_config,
                     bert_embedding_file = args['embed_type'] + '-' + \
                                           args.get('bert_embedding', '')
 
-                    # if bert_embedding_file in ['last-layer.pickle']:
-
                     with open(str(bert_feature_dir / bert_embedding_file),
                               'rb') as f_embed:
                         bert_embedding = pickle.load(f_embed)
@@ -251,20 +195,12 @@ def train(dicts_config,
                             bert_embedding[text] = feature.to(device)
                         args['bert_embedding'] = bert_embedding
 
-                    # else:
-                    #     raise Exception('Unknown bert embedding file {}.'.format(
-                    #         bert_embedding_file))
-
                 model, code = init_model(AttentionModel, **args)
             else:
                 raise Exception('Unknown model {}.'.format(name))
 
-    # TODO: move this into model class itself.
     # Set device.
     model.set_device(device)
-    # model.device = device
-    # model = model.to(device)
-    # model.optimizer.load_state_dict(model.optimizer.state_dict())
 
     # Initialize optimizer.
     assert len(optim_config) == 1, optim_config
@@ -290,9 +226,6 @@ def train(dicts_config,
         train_datasets.append(train_dataset)
     train_loader = DataLoader(
         ConcatDataset(train_datasets), **train_loader_kwargs)
-
-    # train_loader = DataLoader(train_dataset, **train_loader_kwargs)
-    # train_loaders.append(train_loader)
 
     valid_loaders = {}
     for valid_name, valid_config in valid_datasets_config.items():
@@ -335,7 +268,9 @@ def train(dicts_config,
 def init_kwargs(dry_run=True,
                 action=action_options[0],
                 tokenizer='trigram'):
-
+    """
+    Set up default configs.
+    """
     logger.info('dry_run = {}'.format(dry_run))
     logger.info('action = {}'.format(action))
 
@@ -444,10 +379,8 @@ def init_kwargs(dry_run=True,
 
     if action in ['scratch', 'finetune']:
         n_epochs = 10
-        # n_epochs = 20
     elif action in ['pretrain']:
         n_epochs = 20
-        # n_epochs = 50
     else:
         raise Exception('Fail to set n_epochs. ' \
                         'Unknown action {}.'.format(action))
@@ -472,6 +405,10 @@ def init_kwargs(dry_run=True,
         'save_best_only': save_best_only
     }
 
+
+#####
+# Functions that modify the config
+#####
 
 def set_pretrain_datasets(datasets):
     def f(config):
@@ -500,16 +437,6 @@ def set_attention(attention_type):
         config['model_config'] \
               ['AttentionModel'] \
               ['attention_type'] = attention_type
-        # if attention_type == 'no':
-        #     config['model_config']['AttentionModel'].update({
-        #         'embed_dim_act': 256,
-        #         'embed_dim_slot': 256,
-        #         'embed_dim_text': 256,
-        #         'embed_dim_tri': 256,
-        #         'embed_dim': 256,
-        #         'asv_rnn_hidden_size': 256,
-        #         'frame_rnn_hidden_size': 256,
-        #     })
         return config
     return f
 
@@ -529,29 +456,11 @@ def main():
 
     input()
 
-    import time
-    # time.sleep(1 * 60 * 60)
-    # time.sleep(5)
-
-    model_configs_args = [
-        {
-            # 'embed_type': tokenizer,
-            'bert_embedding': 'last-layer.pickle',
-            # 'attention_type': 'simple',
-            # 'attention_type': 'no',
-            # 'attention_type': 'content',
-            # 'asv_with_utterance': False,
-            # 'asv_rnn_hidden': True,
-            # 'asv_rnn_output': False,
-        },
-    ]
-
     pretrain_1 = ('train_mixed_multiwoz.json', 'valid_mixed_multiwoz.json')
     pretrain_2 = ('train_mixed_hotel_restaurant_multiwoz.json',
                   'valid_mixed_hotel_restaurant_multiwoz.json')
     pretrain_3 = ('train_mixed_hotel_transport_multiwoz.json',
                   'valid_mixed_hotel_transport_multiwoz.json')
-
 
     pretrain_datasets = [
         [pretrain_1,],
@@ -562,28 +471,25 @@ def main():
         [pretrain_3,],
     ]
 
+    #####
+    # Train from scratch
+    #####
+    for run in range(n_runs):
+        logger.info('Run {} / {}:'.format(run + 1, n_runs))
 
-    for model_config_args in model_configs_args:
-        break
+        kwargs = init_kwargs(
+            dry_run=dry_run,
+            action=action_options[0],
+            tokenizer=tokenizer)
 
-        # From scratch
-        for run in range(n_runs):
-            logger.info('Run {} / {}:'.format(run + 1, n_runs))
+        kwargs['device_config'] = {'cuda:0': {}}
 
-            kwargs = init_kwargs(
-                dry_run=dry_run,
-                action=action_options[0],
-                tokenizer=tokenizer)
+        kwargs = set_attention(attention_type)(kwargs)
 
-            kwargs['n_epochs'] = 1
-            kwargs['device_config'] = {'cuda:0': {}}
+        random.seed(run)
+        torch.manual_seed(run)
 
-            kwargs = set_attention(attention_type)(kwargs)
-
-            random.seed(run)
-            torch.manual_seed(run)
-
-            train(**kwargs)
+        train(**kwargs)
 
     for datasets in pretrain_datasets:
         # Transfer learning
@@ -593,7 +499,6 @@ def main():
                 action=action_options[1],
                 tokenizer=tokenizer)
 
-            kwargs['n_epochs'] = 1
             kwargs['device_config'] = {'cuda:0': {}}
             kwargs['save'] = True
 
@@ -614,7 +519,6 @@ def main():
                 action=action_options[2],
                 tokenizer=tokenizer)
 
-            kwargs['n_epochs'] = 1
             kwargs['device_config'] = {'cuda:0': {}}
             kwargs['model_config']['checkpoint'] = best_checkpoint
 
