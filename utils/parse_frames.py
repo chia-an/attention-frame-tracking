@@ -16,8 +16,7 @@ class FramesDataset(Dataset):
                        slot_based=False,
                        user_only=False,
                        pad_frame=False,
-                       tokenizer='trigram',
-                       text_position=False):
+                       tokenizer='trigram'):
         import torch
         from utils.dictionary import trigram_iterator
 
@@ -28,22 +27,18 @@ class FramesDataset(Dataset):
             from nltk.tokenize import TweetTokenizer
             tknzr = TweetTokenizer()
 
-        # def tokenize(word):
         def tokenize(sent):
             if tokenizer == 'trigram':
                 return [torch.tensor([tri_to_index[tri]
                                       for tri in trigram_iterator(word)])
                         for word in tknzr.tokenize(sent)]
-                        # for word in sent.split()]
             elif tokenizer == 'word':
                 return [word_to_index[word] for word in tknzr.tokenize(sent)]
-                # return [word_to_index[word] for word in sent.split()]
             elif tokenizer.startswith('bert'):
                 tokenized_text = bert_tknzr.tokenize(
                     ' '.join(['[CLS]', sent, '[SEP]']))
                 indexes = bert_tknzr.convert_tokens_to_ids(tokenized_text)
                 return torch.tensor(indexes)
-                # return indexes
             else:
                 raise Exception('Unknown tokenizer {}.'.format(tokenizer))
 
@@ -63,13 +58,11 @@ class FramesDataset(Dataset):
         else:
             samples = sample_iterator(dials)
 
+        # Turn samples into tensors
         self.data = []
         for sample in samples:
-            # TODO: SOS, EOS, PAD token?
-            # print(sample)
             sent, fasvs, frames, active_frame, new_frames = sample
 
-            # sent = [tokenize(w) for w in sent.split()]
             sent = tokenize(sent)
 
             fs = []
@@ -81,12 +74,10 @@ class FramesDataset(Dataset):
                 asvs.append((act_to_index[a],
                              slot_to_index[s],
                              tokenize(v)))
-                             # [tokenize(w) for w in v.split()]))
             fs = torch.tensor(fs)
 
             frames = [[(slot_to_index[s],
                         tokenize(v))
-                        # [tokenize(w) for w in v.split()])
                        for s, v in frame['slot_value']]
                       for frame in frames]
             if pad_frame:
@@ -124,38 +115,15 @@ class FramesDataset(Dataset):
         return self.data[i]
 
 
-
-### Functions for dialogue jsons ###
+#####
+# Functions for dialogue jsons
+#####
 
 
 def turn_iterator(dials):
     for dial in dials:
         for turn in dial['turns']:
             yield turn
-
-
-# def text_iterator(dials):
-#     for turn in turn_iterator(dials):
-#         yield turn['text']
-
-
-# def act_iterator(turn, authors=['user']):
-#     if turn['author'] in authors:
-#         for act in turn['labels']['acts']:
-#             yield act
-
-
-# def turn_asv_iterator(turn):
-    """ Extract the tuples (action, slot, value).
-    Use the labels in 'acts_without_refs' for each user turns.
-    Ignore actions with no slots because it's not evaluated.
-    """
-    # for dial_id, dial in enumerate(dials):
-    #     for turn_id, turn in enumerate(dial['turns']):
-    # if turn['author'] == 'user': 
-    #     for act in turn['labels']['acts_without_refs']:
-    #         for arg in act['args']:
-    #             yield act['name'], arg['key'], str(arg['val'])
 
 
 def frame_key_value_iterator(act, current_frame=0,
@@ -250,7 +218,6 @@ def fasv_iterator(turn):
 def frame_sv_iterator(frame):
     # "We encode a string representation of the most recent
     # non-negated value v as described in Section 5.1.1."
-    # NOTE: add the value here to text dictionary?
     for s, vs in sorted(frame['info'].items()):
         for v in vs:
             if not v['negated']:
@@ -260,27 +227,20 @@ def frame_sv_iterator(frame):
 def sample_iterator(dials=None,
                     authors=['user', 'wizard'],
                     text_position=False):
-    # NOTE: write a data_loader or not?
     if dials is None:
         with open(str(data_path), 'r') as f_data:
             dials = json.load(f_data)
 
-    # from nltk.tokenize import TweetTokenizer
-
-    # tknzr = TweetTokenizer()
     last_frames = []
     turn_id = 0
 
     for turn in turn_iterator(dials):
-        # # NOTE: consider only user turn or not?
-        # if turn['author'] == 'user' or True:
         if turn['author'] in authors:
             # NOTE: Assume this starts a new dialogue.
             if len(turn['labels']['frames']) < len(last_frames):
                 turn_id = 0
 
             # User utterance.
-            # sent = ' '.join(tknzr.tokenize(turn['text']))
             sent = turn['text']
 
             active_frame = turn['labels']['active_frame'] - 1
@@ -297,7 +257,6 @@ def sample_iterator(dials=None,
                         index = None
                     v = (v, turn_id, index)
 
-                # fasvs.append((f, a, s, ' '.join(tknzr.tokenize(v))))
                 fasvs.append((f, a, s, v))
 
             # Get list of frames.
@@ -306,7 +265,6 @@ def sample_iterator(dials=None,
                 # Each frame has a list of s-v pairs.
                 svs = []
                 for s, v in frame_sv_iterator(frame):
-                    # v = ' '.join(tknzr.tokenize(v))
                     if True or (s, v) not in svs:
                         svs.append((s, v))
                 if svs == []:
@@ -372,35 +330,6 @@ def sample_iterator(dials=None,
 
                         frames[frame_id] = frame
 
-                            # in_parent = (s, v) in parent_frame
-                            # in_utterance = False
-                            # for fasv in fasvs:
-                            #     if s == fasv[2] and \
-                            #        (get_close_matches(v, [fasv[3]]) or v in fasv[3]):
-                            #         in_utterance = True
-                            #     if s.lower() == fasv[1].lower():
-                            #         in_utterance = True
-
-                            # assert in_parent or in_utterance, \
-                            #        (in_parent,
-                            #         in_utterance,
-                            #         (s, v),
-                            #         sent,
-                            #         fasvs, parent_frame)
-
-            # # TODO: keep a list of frame_id to speed up.
-            # # TODO: BUG, new_frames is incorrect (at the beginning of the
-            # #       dialogue) because last_frames is not cleared
-            # new_frames = []
-            # for frame in frames:
-            #     is_new = True
-            #     for old_frame in last_frames:
-            #         # is_new &= frame['frame_id'] != old_frame['frame_id']
-            #         if frame == old_frame:
-            #             is_new = False
-            #     if is_new:
-            #         new_frames.append((frame['frame_id']))
-
             sample = (sent, fasvs, frames, active_frame, new_frames)
 
             yield sample
@@ -426,11 +355,6 @@ def preds_to_dial_json(dials, preds):
             offset = 0
             gen_acts = []
 
-            # n_fasvs = sum(len(list(frame_key_value_iterator(act)))
-            #               for act in turn['labels']['acts'])
-            # assert n_fasvs <= len(pred), \
-            #        (n_fasvs, len(pred), turn, sample)
-
             for act in turn['labels']['acts']:
                 n_fsvs = len(list(frame_key_value_iterator(act)))
                 if n_fsvs:
@@ -451,8 +375,9 @@ def preds_to_dial_json(dials, preds):
     return gen_dials
 
 
-
-### Functions for dictionaries ###
+#####
+# Functions for dictionaries
+#####
 
 
 def text_dictionaries(dials):
@@ -544,8 +469,6 @@ def create_dictionaries():
     act_to_index, index_to_act = action_dictionary(dials)
     slot_to_index, index_to_slot = slot_dictionary(dials)
 
-    # return
-
     with open(str(data_dir / 'word_to_index.json'), 'w') as f_dict:
         json.dump(word_to_index, f_dict)
     with open(str(data_dir / 'index_to_word.json'), 'w') as f_dict:
@@ -614,6 +537,7 @@ def split_dataset():
     
 
 def main():
+    # Some baseline models, mostly the same as in baselines.py
     import random
     random.seed(2)
 
@@ -621,7 +545,6 @@ def main():
         dials = json.load(f_data)
 
     preds = []
-    # for sample in sample_iterator([dials[0]]):
     for sample in sample_iterator(dials):
         sent, fasvs, frames, active_frame, new_frames = sample
         n_frames = len(frames)
@@ -675,6 +598,6 @@ def main():
 
 
 if __name__ == '__main__':
-    # create_dictionaries(); exit()
-    main()
+    # create_dictionaries()
     # split_dataset()
+    main()
