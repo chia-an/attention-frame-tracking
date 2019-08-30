@@ -23,7 +23,6 @@ def mix_turns(lens, rng=None, orders=None, mixables=None):
     def interval_iterator(it, length=None):
         """ Count the distance between 1s.
         ex: output of [1, 0, 1, 1, 0, 0] should be iter([2, 1, 3]).
-        TODO: better implementation
         """
         last = 0
         for i, val in enumerate(it):
@@ -62,7 +61,6 @@ def mix_turns(lens, rng=None, orders=None, mixables=None):
     while True:
         # Get dialogue index.
         if orders is None and index:
-            # dial_id = index[0]
             dial_id = rng.choice(index)
             # Make sure the mixing is interesting.
             while dial_id == last_dial_id and len(index) > 1:
@@ -137,7 +135,7 @@ def generate_mixed_dataset():
 
     # Create a list of mixing recipes.
     # Option: every possible pairs.
-    # Option: mix with other k dialogues. (k ~ 10?)
+    # Option: mix with other k dialogues. (k ~ 10)
 
     # # Single domain mixture.
     # recipes = []
@@ -187,7 +185,6 @@ def generate_mixed_dataset():
         })
 
     # Save.
-    # print(mixed_dataset)
     # with open(str(data_dir / 'mixed_multiwoz.json'), 'w') as f_out:
     with open(str(data_dir / 'mixed_hotel_restaurant_multiwoz.json'),
               'w') as f_out:
@@ -200,7 +197,6 @@ def split_dataset(filename):
     import random
     random.seed(0)
 
-    # with open(str(data_dir / 'mixed_multiwoz.json'), 'r') as f_data:
     with open(str(data_dir / filename), 'r') as f_data:
         mixed_dataset = json.load(f_data)
 
@@ -226,5 +222,5 @@ def split_dataset(filename):
 if __name__ == '__main__':
     pass
     # generate_mixed_dataset()
-    split_dataset('mixed_hotel_transport_multiwoz.json')
+    # split_dataset('mixed_hotel_transport_multiwoz.json')
 

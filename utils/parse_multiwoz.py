@@ -18,13 +18,10 @@ raw_dials_path = data_dir / 'data.json'
 class MultiwozDataset(Dataset):
     def __init__(self, dicts,
                        data_filename='train_mixed_multiwoz.json',
-                       use_trigram=True,
                        subsample=None,
                        pad_frame=False,
                        tokenizer='trigram'):
         import torch
-        # TODO: a better way to load dictionary utils ... 
-        #       relative path issue
         from utils.dictionary import trigram_iterator
 
         if tokenizer.startswith('bert'):
@@ -41,10 +38,8 @@ class MultiwozDataset(Dataset):
                 return [torch.tensor([tri_to_index[tri]
                                       for tri in trigram_iterator(word)])
                         for word in tknzr.tokenize(sent)]
-                        # for word in sent.split()]
             elif tokenizer == 'word':
                 return [word_to_index[word] for word in tknzr.tokenize(sent)]
-                # return [word_to_index[word] for word in sent.split()]
             elif tokenizer.startswith('bert'):
                 tokenized_text = bert_tknzr.tokenize(
                     ' '.join(['[CLS]', sent, '[SEP]']))
@@ -63,15 +58,13 @@ class MultiwozDataset(Dataset):
         with open(str(data_dir / data_filename), 'r') as f_data:
             mixed_dials = json.load(f_data)
 
+        # Turn samples into tensors
         self.data = []
         for mixed_dial in mixed_dials:
             dials = [raw_dials[dial_id] for dial_id in mixed_dial['dials']]
             for sample in mixed_dialogue_samples(dials, mixed_dial['turns']):
-                # TODO: SOS, EOS, PAD token?
-                # print(sample)
                 sent, fasvs, frames, active_frame, new_frames = sample
 
-                # sent = [tokenize(w) for w in sent.split()]
                 sent = tokenize(sent)
 
                 fs = []
@@ -81,12 +74,10 @@ class MultiwozDataset(Dataset):
                     asvs.append((act_to_index[a],
                                  slot_to_index[s],
                                  tokenize(v)))
-                                 # [tokenize(w) for w in v.split()]))
                 fs = torch.tensor(fs)
 
                 frames = [[(slot_to_index[s],
                             tokenize(v))
-                            # [tokenize(w) for w in v.split()])
                            for s, v in frame]
                           for frame in frames]
                 if pad_frame:
@@ -112,13 +103,6 @@ class MultiwozDataset(Dataset):
 
                 self.data.append((
                     fs, sent, asvs, frames, active_frame, new_frames))
-
-                # assert fs is not None, (self.data[-1], sample)
-                # assert sent is not None, (self.data[-1], sample)
-                # assert asvs is not None, (self.data[-1], sample)
-                # assert frames is not None, (self.data[-1], sample)
-                # assert active_frame is not None, (self.data[-1], sample)
-                # assert new_frames is not None, (self.data[-1], sample)
 
                 if subsample is not None and len(self.data) >= subsample:
                     return
@@ -170,15 +154,9 @@ def parse_turns(turns, verbose=False):
 
     NOTE:
     - There may be some coreference/anaphora in the utterance.
-    - The change of slot value is not handled, i.e. it assumes
-      a new domain-slot-value means corresponds to a newly filled
-      slot, but it can be a change of slot value. Detection can
-      be done by looking at both d-s and d-s-v tuples, but handling
-      frame creation and maintaining frames can be complicated.
-      (Is this handled now?)
     - Special case: the first turn should always be mixable.
     - Sometimes a d-s-v may disappear in the metadata, which is weird.
-      (Examples needed)
+    - Mixable turns are called identifying turns in the report.
     """
     n_turns = len(turns) // 2
     last_state = {}
@@ -192,7 +170,6 @@ def parse_turns(turns, verbose=False):
         is_new_frame = False
 
         # There are some errors in the label.
-        # TODO: return? continue? yield something?
         if u_turn['metadata']:
             return
 
@@ -265,10 +242,6 @@ def mixed_dialogue_samples(dials,
 
     Yield a training sample for each turn of the mixed dialogue.
     """
-    # from nltk.tokenize import TweetTokenizer
-
-    # tknzr = TweetTokenizer()
-
     n_turns = [len(dial['log']) // 2 for dial in dials]
     mixables = []
     states = []
@@ -284,8 +257,6 @@ def mixed_dialogue_samples(dials,
         random.seed(0)
         mixed_turns = mix_turns(n_turns, rng=random, mixables=mixables)
 
-    # TODO: integrate slot types from MultiWOZ and FRAMES?
-
     frames = []
     last_frame = []
     dsv_to_f = {}
@@ -293,7 +264,6 @@ def mixed_dialogue_samples(dials,
     for index, turn_id in mixed_turns:
         dial = dials[index]
 
-        # sent = ' '.join(tknzr.tokenize(dial['log'][turn_id * 2]['text']))
         sent = dial['log'][turn_id * 2]['text']
 
         state = next(states[index])
@@ -326,7 +296,6 @@ def mixed_dialogue_samples(dials,
 
         for d, s, v in dsvs:
             f = dsv_to_f.get((index, d, s, v), active_frame)
-            # fasvs.append((f, 'NULL', d + '-' + s, ' '.join(tknzr.tokenize(v))))
 
             v2 = v
             if text_position:
@@ -354,8 +323,9 @@ def load_data():
     return raw_dials
 
 
-
-### Dictionaries ###
+#####
+# Dictionaries
+#####
 
 
 def text_dictionaries(dials):
