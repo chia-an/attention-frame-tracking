@@ -479,7 +479,7 @@ def set_bert_embedding(embedding):
 
 
 def main():
-    n_runs = 1
+    n_runs = 5
 
     dry_run = False
     device = 'cuda:0'
@@ -504,7 +504,6 @@ def main():
 
         kwargs['device_config'] = {device: {}}
 
-        kwargs['save'] = True
         kwargs = set_bert_embedding(None)(kwargs)
         kwargs = set_attention('simple')(kwargs)
         # kwargs = set_input_dim(256)(kwargs)

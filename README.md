@@ -8,6 +8,7 @@
 5. Call `split_dataset(DATASET_NAME)` in `utils/mix_multiwoz.py` to split the generated synthetic dataset.
 
 ## Training
+Pre-compute the BERT feature using the script `utils/bert_feature.py`.
 - `train.py`: trains a model both from scratch and with transfer learning.
 - `train-transfer.py`: trains a model with different pre-training dataset.
 - `hyper.py`: is the script for hyperparameter tuning.
