@@ -52,13 +52,11 @@ def main():
     bert_version = 'bert-base-uncased'
     device = torch.device('cuda:1')
 
-    # bert_tknzr = BertTokenizer.from_pretrained(bert_version)
     bert_model = BertModel.from_pretrained(bert_version).to(device)
     bert_model.eval()
 
     embeddings = {}
     with torch.no_grad():
-        # for text, _ in zip(text_iterator(bert_version), range(10)):
         for text in tqdm(text_iterator(bert_version),
                          bar_format='{l_bar}{r_bar}'):
             key = str(text.tolist())
@@ -68,12 +66,8 @@ def main():
 
             encoded_layers, pooled_output = bert_model(text.to(device))
 
-
-            # TODO: do something here
             embedding = encoded_layers[-1].mean(dim=1).view(-1)
 
-
-            # embeddings[str(text.view(-1).tolist())] = embedding
             embeddings[key] = embedding
 
     filename = 'bert-base-uncased-last-layer.pickle'
@@ -82,5 +76,4 @@ def main():
 
 
 if __name__ == '__main__':
-    pass
     main()
