@@ -536,68 +536,7 @@ def split_dataset():
             json.dump(fold_dials[i], f_data)
     
 
-def main():
-    # Some baseline models, mostly the same as in baselines.py
-    import random
-    random.seed(2)
-
-    with open(str(data_path), 'r') as f_data:    
-        dials = json.load(f_data)
-
-    preds = []
-    for sample in sample_iterator(dials):
-        sent, fasvs, frames, active_frame, new_frames = sample
-        n_frames = len(frames)
-        preds_turn = [[0] * n_frames for _ in range(len(fasvs))]
-
-        # Do something here.
-
-        # Random
-        for i, fasv in enumerate(fasvs):
-            frame = random.randrange(n_frames)
-            preds_turn[i][frame] = 1
-
-        # # Perfect answer
-        # for i, fasv in enumerate(fasvs):
-        #     preds_turn[i][0] = 1
-        #     preds_turn[i][fasv[0]] = 1
-        # act_based = [0] * n_frames
-        # for fasv in fasvs:
-        #     if fasv[2] == 'NOANNO':
-        #         act_based[fasv[0]] = 1
-        # for i, fasv in enumerate(fasvs):
-        #     if fasv[2] == 'NOANNO':
-        #         preds_turn[i] = act_based
-        #     else:
-        #         preds_turn[i][fasv[0]] = 1
-
-        # # Compare sv to sv in frames
-        # #   ref to the first appearance
-        # #   o.w. ref to active frame
-        # for i, fasv in enumerate(fasvs):
-        #     frame_id = active_frame
-        #     for frame in frames:
-        #         found = False
-        #         for sv in frame['slot_value']:
-        #             is_equal = (fasv[2], fasv[3]) == sv
-        #             if is_equal:
-        #                 frame_id = frame['frame_id']
-        #                 found = True
-        #                 break
-        #         if found:
-        #             break
-        #     preds_turn[i][frame_id] = 1
-
-        preds.append(preds_turn)
-
-    gen_dials = preds_to_dial_json(dials, preds)
-
-    with open(str(Path(__file__).parent / \
-        '../results/gen_frames.json'), 'w') as f_gen:
-        json.dump(gen_dials, f_gen)
-
-
 if __name__ == '__main__':
+    pass
     # create_dictionaries()
     # split_dataset()
-    main()
