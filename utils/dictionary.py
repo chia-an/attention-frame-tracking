@@ -9,6 +9,9 @@ def trigram_iterator(word):
 
 
 def merge(ti1, it1, ti2, it2):
+    """ Merge two dictionaries
+    The indices of the first set of tokens are fixed.
+    """
     t_to_i = ti1.copy()
     i_to_t = it1.copy()
 
@@ -17,10 +20,6 @@ def merge(ti1, it1, ti2, it2):
             index = len(t_to_i) + 1
             t_to_i[token] = index
             i_to_t[index] = token
-
-    # print('ori 1 size = {}'.format(len(ti1)))
-    # print('ori 2 size = {}'.format(len(ti2)))
-    # print('comb size = {}'.format(len(t_to_i)))
 
     return t_to_i, i_to_t
 
