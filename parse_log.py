@@ -16,16 +16,8 @@ def agg_runs(values):
 
 
 def main():
-    # log_path = log_dir / '0621-141625.log'  # bert, no att
-    # log_path = log_dir / '0621-142113.log'  # bert, simple
-    # log_path = log_dir / '0621-143035.log'  # tri, no att
-    # log_path = log_dir / '0621-143440.log'  # tri, simple
-
-    # log_path = log_dir / '0708-162344.log'  # tri simple
-    log_path = log_dir / '0708-162517.log'  # tri no
-    # log_path = log_dir / '0708-162711.log'  # bert simple
-    # log_path = log_dir / '0708-162833.log'  # bert no
-
+    # Set the path of the log
+    log_path = None
 
     with open(str(log_path), 'r') as f:
         master_log = f.read()
@@ -37,10 +29,7 @@ def main():
     method = 'frames'
     
     for run_id in run_ids:
-        # with open(str(log_dir / 'bert-0708' / run_id / 'log'), 'r') as f:
-        # with open(str(log_dir / 'bert-0621' / run_id / 'log'), 'r') as f:
-        # with open(str(log_dir / 'trigram-0621' / run_id / 'log'), 'r') as f:
-        with open(str(log_dir / 'trigram-0708' / run_id / 'log'), 'r') as f:
+        with open(str(log_dir / run_id / 'log'), 'r') as f:
             log = f.read()
 
             config_str = re.findall(
@@ -108,7 +97,7 @@ def main():
             if not is_pretrain and len(test_score) > 0:
                 test_scores.append(float(test_score[0]) * 100)
 
-            if len(valid_scores) == 10 or len(test_score) == 0:
+            if len(valid_scores) == 5 or len(test_score) == 0:
                 data = {
                     '# of runs': len(valid_scores),
                     'Valid accuracy': agg_runs(valid_scores),
@@ -127,8 +116,6 @@ def main():
 
                 valid_scores = []
                 test_scores = []
-
-        # break
 
 
 if __name__ == '__main__':
