@@ -1,11 +1,28 @@
 # Dialogue frame tracking with attention
 
-## Data
+## Dependency
+- PyTorch 1.2.0
+- Other dependencies are in `requirements.txt`
+
+## Data and preprocessing
 1. Download the datasets [MultiWOZ2](http://dialogue.mi.eng.cam.ac.uk/index.php/corpus/) and [FRAMES](https://datasets.maluuba.com/Frames/dl) to the directory `../data/`.
-2. Call `create_dictionaries()` in `utils/parse_frames.py` and `utils/parse_multiwoz.py`.
-3. Call `split_dataset()` in `utils/parse_frames.py` to do the 10-fold split on FRAMES.
-4. Call `generate_mix_datasets()` in `utils/mix_multiwoz.py`. Comment / uncomment different parts to change the setting of generation.
-5. Call `split_dataset(DATASET_NAME)` in `utils/mix_multiwoz.py` to split the generated synthetic dataset.
+2. In the directory `./utils`, call `create_dictionaries()` in `utils/parse_frames.py` and `utils/parse_multiwoz.py`.
+```
+$ python3 -c "import parse_frames as m; m.create_dictionaries()"
+$ python3 -c "import parse_multiwoz as m; m.create_dictionaries()"
+```
+3. In the directory `./utils`, call `split_dataset()` in `utils/parse_frames.py` to do the 10-fold split on FRAMES.
+```
+$ python3 -c "import parse_frames as m; m.split_dataset()"
+```
+4. In the directory `./utils`, call `generate_mixed_dataset()` in `utils/mix_multiwoz.py`. Comment / uncomment different parts to change the setting of generation.
+```
+$ python3 -c "import mix_multiwoz as m; m.generate_mixed_dataset()"
+```
+5. In the directory `./utils`, call `split_dataset(DATASET_NAME)` in `utils/mix_multiwoz.py` to split the generated synthetic dataset.
+```
+$ python3 -c "import mix_multiwoz as m; m.split_dataset(DATASET_NAME)"
+```
 
 ## Training
 Pre-compute the BERT feature using the script `utils/bert_feature.py`.
