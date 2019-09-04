@@ -1,0 +1,37 @@
+Dialogue based assistants, also known as chatbots, are becoming increasingly popular. As improvements in machine learning help us better understand the nuances of natural language, dialogue systems can accomplish more and more complex tasks. 
+
+Existing implementations of dialogue systems are most often goal-oriented and help the user perform a specific task like booking a train ticket or reserving a table.
+A goal-oriented dialogue system is like an interface between user and database. When a user knows exactly what he wants, the workflow is straightforward: the system extracts information from user's requests, translate it into database query, and return results to the user. However, this does not work for users who want to explore different options and even compare them, which could happen in many situations such as booking hotels or flights. The reason is that the system keeps only the latest information and loses previous ones when a user changes his mind.
+
+The frame tracking task is proposed to solve this problem \cite{asri2017frames}. In frame tracking, the system maintains a list of frames during a dialogue. A frame is the context for the current turn, or in other words, a summary of a discussion in a dialogue. For example, in a dialogue about booking a traveling package, a frame may contain the price, the number of people, check-in and check-out date, etc., as shown in Table \ref{tab:ex-frame}.
+\begin{table}
+    \centering
+    \caption[An example of a frame]{An example of a frame.}
+    \label{tab:ex-frame}
+    \begin{tabular}[t]{ll}
+        \toprule
+        Slot & Value \\
+        \midrule
+        Budget & 21.3 \\
+        Origin city & Kochi \\
+        Destination city & Denver \\
+        \# adults & 2 \\
+        \# children & 6 \\
+        Duration & 7 \\
+        Start date & August 27 \\
+        End date & September 1 \\
+        Category & 4.0 \\
+        Price & 19028.93 \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+%While keeping such list in memory is easy,
+The main idea of frame tracking is to make use of this information to improve the system. For each turn in a dialogue, the system finds out the frames related to the current utterance and create frame references.
+%At any point of a dialogue, the system chooses one frame to be an active frame, i.e. the frame that is most relevant to the current discussion.
+As the conversation goes on, the system may create new frames or change the referred frames. If we consider the list of frames as the memory of the system, the two operations are like storing into and retrieving from memory.
+
+In this paper, we focus on the problem of predicting frame reference. The input of the problem consists of two parts: one is a list of frames $F = \{f_1,\dotsc,f_n\}$ representing the dialogue history, the other is a natural language understanding (NLU) label of the current utterance. The output is the predicted frame reference, which should be a frame $f_i$ in the list $F$ indicating that this is the frame most related to the label.
+
+Previous research \cite{schulz2017frame} on frame tracking uses recurrent neural networks (RNN) to encode frames into vectors. However, this ignores the fact that each slot-value pair has different importance when the reference NLU label is different. For example, when the label is a location, the destination city and origin city slots should be more important than the number of people when we try to find the most relevant frame. Therefore, we propose a new model that uses an attention mechanism to account for this.
+
+Another challenge of frame tracking is the limited amount of available data. The only dataset that has frame tracking labels is FRAMES \cite{asri2017frames}, which only has 1369 dialogues. This is relatively small comparing to other benchmark dialogue datasets. So we come up with a method to create synthetic frame tracking data using large dialogue datasets that don't have frame tracking labels.

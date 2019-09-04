@@ -1,0 +1,39 @@
+\label{sec:syn}
+The amount of data in FRAMES is limited. To have more training data for frame tracking, we generate synthetic dialogues that have a similar structure as the ones in FRAMES. More precisely, we create actions of switching frame reference by interleaving multiple simple dialogues.
+
+% what is interleaving (still hard to understand...)
+The operation of interleaving a set of dialogues is defined as follows. For each user turn, the utterance is chosen from any dialogue in the set, and utterance of the following system turn is the response to the corresponding user utterance. The chosen dialogue can be arbitrary in each user turn, but the turns should be taken in the same order as in the original dialogue. The result is as if multiple users were talking to the system at the same time.
+This is an effective way to create artificial frame switching actions because there is a context switch whenever we choose a dialogue that is different from the source of the previous turn. However, such switches can be ambiguous if dialogues are chosen arbitrarily in each turn. Some turns do not have enough information themselves to identify a frame without context. If those turns are placed after another turn from a different dialogue, it might be impossible to find out the referred frame or even notice a switch exists.
+% how to interleave (mixable turn) (identifying turn)
+To avoid this problem, we define the notion of identifying turn. An identifying turn is a turn that has explicit mention of slot values in its referred frame. When interleaving dialogues, we switch dialogues only at identifying turns.
+
+% how to create frames labels
+% how to create frame references
+The frame label of the interleaved dialogue can be easily obtained from the source dialogues: if a new frame is created in a turn of source dialogue, the same frame is created in the corresponding turn in the interleaved dialogue. Similarly, for each slot-value in the utterance of interleaved dialogue, the frame reference is copied directly from its source dialogue.
+
+%\subsection{MultiWOZ dataset}
+%MultiWOZ: large, multiple domain, multidomain dialogue, state of each turn
+The dataset we use to create synthetic data is MultiWOZ 2.0 \cite{budzianowski2018multiwoz}.
+%MultiWOZ is the dataset we use to create synthetic data.
+It is a large scale goal-oriented dataset created for multi-domain dialogue modeling. It consists of about 10,000 dialogues and covers a wide range of domains, including restaurant, train, hotel, etc. It has both single domain dialogue and multi-domain dialogue. Despite having rich content, it only has dialogue state label for every two turns (user turn and system turn) and no annotation of frames so we have to convert the labels into frame labels.
+%We use heuristic rules described in Algorithm (...) to transform states into frames.
+We then take the single domain dialogues along with their frame labels and interleave them to generate synthetic datasets.
+We generate one synthetic dialogue by interleaving two dialogues. The two dialogues are in the same domain for the first synthetic dataset, and the domains are different for the other two synthetic datasets. More information on the three synthetic datasets we generated are listed in Table \ref{tab:syn}.
+
+%[Algorithm that transforms states to frames]
+
+\begin{table}
+    \centering
+    \caption[Synthetic datasets]{Synthetic datasets.}
+    \label{tab:syn}
+    \begin{tabular}{lrl}
+        \toprule
+         & \# dialogues & Domain(s) \\
+        \midrule
+        FRAMES & 1369 & Hotel + flight \\
+        Synthetic 1 & 5488 & Single domain \\
+        Synthetic 2 & 3820 & Hotel + restaurant \\
+        Synthetic 3 & 3820 & Hotel + transportation (taxi and train) \\
+        \bottomrule
+    \end{tabular}
+\end{table}

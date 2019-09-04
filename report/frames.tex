@@ -1,0 +1,400 @@
+\section{FRAMES dataset}
+
+FRAMES dataset is created specifically for the frame tracking task. Its dialogues are longer and more complicated comparing to the ones in other datasets, and there are special labels for frame tracking. The dialogues were collected in a wizard-of-oz fashion: two people playing the role of user and system, with the user having a goal hidden from the system, and with the system having a database unknown to the user \cite{kelley1984iterative, rieser2005corpus, wen2016network}. The users' tasks are designed so that users have to go back-and-forth between options to achieve their goal and thus creates complicated dialogue structures.
+% what is action, slot, value?
+For each utterance, there are annotations of NLU labels, i.e. action, slot, and value, and an optional frame reference label if this action-slot-value tuple is related to a previous frame. The frame is then represented as a list of slot-value pairs.
+
+% user turn only? A: mention in experiment
+The frame references appearing in FRAMES can be categorized into three types: explicit, anaphora, and implicit. Explicit reference is when the NLU label appears in the referred frame, i.e. the user mentions a slot value explicitly. Reference using anaphora is similar except that the user uses anaphora instead of a slot value. The problem of resolving this kind of reference is closely related to the coreference resolution in dialogues. Implicit reference happens when the utterance itself contains no clue and the reference depends heavily on the context of the dialogue. In such cases, the referred frame is usually the one mentioned in the previous turn.
+
+Here are some examples of each type of frame reference. The slot values having a reference are in bold.
+\begin{itemize}
+    \item Explicit: a detailed example is in Table \ref{tab:ex-explicit}.
+    \begin{itemize}
+        \item How many days would I be in \textbf{Kobe}? %(dial id = 1, turn id = 12)
+        \item Ok, I would like to purchase the trip with the \textbf{4 star} hotel. %(dial id = 4, turn id = 6)
+    \end{itemize}
+
+    \item Anaphora: a detailed example in Table \ref{tab:ex-anaphora}.
+    \begin{itemize}
+        \item No, \textbf{that}'s too far for me. I need a flight that leaves from Birmingham. %(dial id = 1, turn id = 10)
+        \item Ok, then I would like to purchase \textbf{this package}. What activities are included in this package? %(dial id = 1, turn id = 16)
+    \end{itemize}
+    
+    \item Implicit: without context, these might look the same as explicit references. The difference is that the slots and values here do not appear in any existing frames thus can not be explicit references. A detailed example is in Table \ref{tab:ex-implicit}.
+    \begin{itemize}
+        \item{
+            %SYSTEM: Yes, I do. I have one for 8445.37 USD. Would you like to book this package? The guest rating is 7.15 / 10 and ... at 1:00 a.m.
+            Is \textbf{breakfast} included? %(dial id = 3, turn id = 8)
+        }
+        \item{
+            %SYSTEM: Ok. I can upgrade your flights to business class for a total of 2715.60 USD. Would you like that?
+            Yes perfect. How is the \textbf{hotel}? %(dial id = 33, turn id = 6)
+        }
+        \item{
+            %SYSTEM: Okay, our best deal in Santos is a 7 day trip at a 3.5 star hotel near a museum and a palace.
+            Reasonable. Any free \textbf{wifi} for the kids? %(dial id = 1191, turn id = 4)
+        }
+    \end{itemize}
+\end{itemize}
+
+%[explain detailed example]
+%[frame reference can be far]
+
+\begin{table}
+    \centering
+    \caption[Explicit frame reference]{An example of explicit frame reference. The frames are in Table \ref{tab:ex-explicit-frames}.}
+    \label{tab:ex-explicit}
+    \begin{tabularx}{\textwidth}{llX|l}
+        \toprule
+        Turn & Author & Utterance & Remark \\
+        \midrule
+        1 & User & Hello, I am looking to book a trip for 2 adults and 6 children for \$21,300 or less. We are departing from Kochi for Denver. & Create frame 1 \\
+        2 & System & I have several options available within your budget. How long would you like to travel for? And do you have dates in mind? & Update frame 1 \\
+        3 & User & I do not have any dates in mind. I would like to spend as much time in Denver as my budget will allow. & Update frame 1 \\
+        4 & System & I can book 7 days at a 4.0 star hotel for 19028.93USD. I can also book 7 days at a 3.0 star hotel for 12824.84USD. & Create frame 2 and 3 \\
+        5 & User & Do these packages have different departure dates? When would I be leaving for each of them? & \\
+        6 & System & The 3.0 star trip leaves Kochi August 26 and returns August 31. The 4.0 star leaves August 27 from Kochi and returns September 1. & Update frame 2 and 3 \\
+        7 & User & Ok, I would like to purchase the trip with the \textbf{4-star} hotel. & Refer to frame 2 \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+\begin{table}
+    \centering
+    \caption[Frames of explicit frame reference]{Frames created in the example dialogue of explicit frame reference (Table \ref{tab:ex-anaphora}).}
+    \label{tab:ex-explicit-frames}
+    \begin{subtable}[t]{0.48\textwidth}
+        \centering
+        \caption{Frame 1}
+        \begin{tabular}[t]{ll}
+            \toprule
+            Slot & Value \\
+            \midrule
+            Intent & book \\
+            Budget & 21.3 \\
+            Origin city & Kochi \\
+            Destination city & Denver \\
+            \# adults & 2 \\
+            \# children & 6 \\
+            Count & several options \\
+            Start date & -1 \\
+            End date & -1 \\
+            Max duration & \$MAX \\
+            \bottomrule
+        \end{tabular}
+    \end{subtable}
+    \begin{subtable}[t]{0.48\textwidth}
+        \centering
+        \caption{Frame 2}
+        \begin{tabular}[t]{ll}
+            \toprule
+            Slot & Value \\
+            \midrule
+            Intent & book \\
+            Budget & 21.3 \\
+            Origin city & Kochi \\
+            Destination city & Denver \\
+            \# adults & 2 \\
+            \# children & 6 \\
+            Max duration & \$MAX \\
+            Duration & 7 \\
+            Start date & August 27 \\
+            End date & September 1 \\
+            Category & 4.0 \\
+            Price & 19028.93 \\
+            \bottomrule
+        \end{tabular}
+    \end{subtable}
+    
+    \vspace{\baselineskip}
+    \begin{subtable}[t]{\textwidth}
+        \centering
+        \caption{Frame 3}
+        \begin{tabular}[t]{ll}
+            \toprule
+            Slot & Value \\
+            \midrule
+            Intent & book \\
+            Budget & 21.3 \\
+            Origin city & Kochi \\
+            Destination city & Denver \\
+            \# adults & 2 \\
+            \# children & 6 \\
+            Max duration & \$MAX \\
+            Duration & 7 \\
+            Start date & August 26 \\
+            End date & August 31 \\
+            Category & 3.0 \\
+            Price & 12824.84 \\
+            \bottomrule
+        \end{tabular}
+    \end{subtable}
+\end{table}
+
+\iffalse
+\begin{table}
+    \centering
+    %\resizebox{0.5\columnwidth}{!}{
+    \begin{subtable}[t]{0.3\textwidth}
+        \centering
+        %\resizebox{\columnwidth}{!}{
+        \begin{tabular}[t]{ll}
+            \toprule
+            Slot & Value \\
+            \midrule
+            Intent & book \\
+            Budget & 21.3 \\
+            Origin city & Kochi \\
+            Destination city & Denver \\
+            \# adults & 2 \\
+            \# children & 6 \\
+            Count & several options \\
+            Start date & -1 \\
+            End date & -1 \\
+            Max duration & \$MAX \\
+            \bottomrule
+        \end{tabular}
+        %}
+        \caption{Frame 1}
+    \end{subtable}
+    \hspace{\fill}
+    \begin{subtable}[t]{0.3\textwidth}
+        \centering
+        %\resizebox{\columnwidth}{!}{
+        \begin{tabular}[t]{ll}
+            \toprule
+            Slot & Value \\
+            \midrule
+            Intent & book \\
+            Budget & 21.3 \\
+            Origin city & Kochi \\
+            Destination city & Denver \\
+            \# adults & 2 \\
+            \# children & 6 \\
+            Max duration & \$MAX \\
+            Duration & 7 \\
+            Start date & August 27 \\
+            End date & September 1 \\
+            Category & 4.0 \\
+            Price & 19028.93 \\
+            \bottomrule
+        \end{tabular}
+        %}
+        \caption{Frame 2}
+    \end{subtable}
+    \hspace{\fill}
+    \begin{subtable}[t]{0.3\textwidth}
+        \centering
+        %\resizebox{\columnwidth}{!}{
+        \begin{tabular}[t]{ll}
+            \toprule
+            Slot & Value \\
+            \midrule
+            Intent & book \\
+            Budget & 21.3 \\
+            Origin city & Kochi \\
+            Destination city & Denver \\
+            \# adults & 2 \\
+            \# children & 6 \\
+            Max duration & \$MAX \\
+            Duration & 7 \\
+            Start date & August 26 \\
+            End date & August 31 \\
+            Category & 3.0 \\
+            Price & 12824.84 \\
+            \bottomrule
+        \end{tabular}
+        %}
+        \caption{Frame 3}
+    \end{subtable}
+    %}
+    \caption{Caption}
+    \label{tab:ex-frames2}
+\end{table}
+\fi
+
+
+\begin{table}
+    \centering
+    \caption[Anaphora frame reference]{An example of anaphora frame reference. The frames are in Table \ref{tab:ex-anaphora-frames}. The reference in turn 11 and ``the hotel" part in turn 13 is an anaphora, and the ``Fortaleza" in turn 13 is explicit because it directly mentions a slot value.}
+    \label{tab:ex-anaphora}
+    \begin{tabularx}{\textwidth}{llX|l}
+        \toprule
+        Turn & Author & Utterance & Remark \\
+        \midrule
+        1 & User & Hey im looking to check out fortaleza. I'm leaving from Sapporo on August 27 & Create frame 1 \\
+        2 & System & Hi there! I can offer you a six-day vacation package starting August 27th for only 3933.10USD. Does this fit within your budget? & Create frame 2 \\
+        3 & User & When is the return date? & \\
+        4 & System & You would be returning on the 31st of August. & Update frame 2 \\
+        5 & User & I would like to travel until September 7, or closer to that date. ... & \\
+        %& & & \\
+        \vdots & \vdots & \vdots & \vdots \\
+        %5 & User & I would like to travel until September 7, or closer to that date. Is there anything available in Frankfurt for that window? & \\
+        %6 & System & Unfortunately those are the closest days I can offer you to your specifications. & \\
+        %7 & User & What about in Ulsan? & \\
+        %8 & System & It looks like every package available is for the 27th - 30th of August, with the best deal being 472.37USD for the trip. & \\
+        9 & User & Ok. One last destination I am wondering about. Curitiba - what've you got there? & Create frame 6 \\
+        10 & System & How about August 30th - September 6th at the Hotel Leisure? 4234.65USD if you book now. & Create frame 7 \\
+        11 & User & I like the sounds of that. What is \textbf{the hotel} like? Any details? & Refer to frame 7 \\
+        12 & System & The Hotel Leisure is a 3-star resort with a 6.91/10 guest rating, free breakfast, free wifi and free parking. Would you like me to book this destination? & Update frame 7 \\
+        13 & User & What is \textbf{the hotel in Fortaleza} like? & Refer to frame 2 \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+\begin{table}
+    \centering
+    \caption[Frames of anaphora frame reference]{Frames created in the example dialogue of anaphora frame reference (Table \ref{tab:ex-anaphora}).}
+    \label{tab:ex-anaphora-frames}
+    \begin{subtable}[t]{0.48\textwidth}
+        \centering
+        \caption{Frame 1}
+        \begin{tabular}[t]{ll}
+            \toprule
+            Slot & Value \\
+            \midrule
+            Intent & book \\
+            Origin city & Sapporo \\
+            Destination city & Fortaleza \\
+            Start date & August 27 \\
+            \bottomrule
+        \end{tabular}
+    \end{subtable}
+    \begin{subtable}[t]{0.48\textwidth}
+        \centering
+        \caption{Frame 2}
+        \begin{tabular}[t]{ll}
+            \toprule
+            Slot & Value \\
+            \midrule
+            Intent & book \\
+            Origin city & Sapporo \\
+            Destination city & Fortaleza \\
+            Start date & August 27 \\
+            End date & August 31 \\
+            Duration & 6 \\
+            Price & 3933.1 \\
+            \bottomrule
+        \end{tabular}
+    \end{subtable}
+    
+    \vspace{\baselineskip}
+    \begin{subtable}[t]{0.48\textwidth}
+        \centering
+        \caption{Frame 6}
+        \begin{tabular}[t]{ll}
+            \toprule
+            Slot & Value \\
+            \midrule
+            Intent & book \\
+            Origin city & Sapporo \\
+            Destination city & Curitiba \\
+            Start date & August 27 \\
+            \bottomrule
+        \end{tabular}
+    \end{subtable}
+    \begin{subtable}[t]{0.48\textwidth}
+        \centering
+        \caption{Frame 7}
+        \begin{tabular}[t]{ll}
+            \toprule
+            Slot & Value \\
+            \midrule
+            Intent & book \\
+            Origin city & Sapporo \\
+            Destination city & Curitiba \\
+            Start date & August 30 \\
+            End date & September 6 \\
+            Name & Hotel Leisure \\
+            Category & 3.0 \\
+            Price & 4234.65 \\
+            Guest rating & 6.91 \\
+            Breakfast & true \\
+            Parking & true \\
+            Wifi & true \\
+            \bottomrule
+        \end{tabular}
+    \end{subtable}
+\end{table}
+
+
+
+
+\begin{table}
+    \centering
+    \caption[Implicit frame reference]{An example of implicit frame reference. The frames are in Table \ref{tab:ex-implicit-frames}.}
+    \label{tab:ex-implicit}
+    \begin{tabularx}{\textwidth}{llX|l}
+        \toprule
+        Turn & Author & Utterance & Remark \\
+        \midrule
+        1 & User & Hello I am looking to bring my 6 kids and I to Portland and leave from Minneapolis. We can travel whenever and have no budgetary constraints. & Create frame 1 \\
+        2 & System & Unfortunately we don't have any available trips to Portland as of right now. Is there another city you can go to? & Update frame 1 \\
+        3 & User & Ahh... Let's check Santos then. & Create frame 2 \\
+        4 & System & Okay, our best deal in Santos is a 7 day trip at a 3.5 star hotel near a museum and a palace. & Create frame 3 \\
+        5 & User & Reasonable. Any \textbf{free wifi} for the kids? & Refer to frame 3 \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+\begin{table}
+    \centering
+    \caption[Frames of implicit frame reference]{Frames created in the example dialogue of implicit frame reference (Table \ref{tab:ex-implicit}).}
+    \label{tab:ex-implicit-frames}
+    \begin{subtable}[t]{0.48\textwidth}
+        \centering
+        \caption{Frame 1}
+        \begin{tabular}[t]{ll}
+            \toprule
+            Slot & Value \\
+            \midrule
+            Intent & book \\
+            Origin city & Minneapolis \\
+            Destination city & Portland \\
+            \# children & 6 \\
+            Start date & -1 \\
+            Budget & -1 \\
+            No result & true \\
+            \bottomrule
+        \end{tabular}
+    \end{subtable}
+    \begin{subtable}[t]{0.48\textwidth}
+        \centering
+        \caption{Frame 2}
+        \begin{tabular}[t]{ll}
+            \toprule
+            Slot & Value \\
+            \midrule
+            Intent & book \\
+            Origin city & Minneapolis \\
+            Destination city & Santos \\
+            \# children & 6 \\
+            Start date & -1 \\
+            Budget & -1 \\
+            \bottomrule
+        \end{tabular}
+    \end{subtable}
+    
+    \vspace{\baselineskip}
+    \begin{subtable}[t]{\textwidth}
+        \centering
+        \caption{Frame 3}
+        \begin{tabular}[t]{ll}
+            \toprule
+            Slot & Value \\
+            \midrule
+            Intent & book \\
+            Origin city & Minneapolis \\
+            Destination city & Santos \\
+            \# children & 6 \\
+            Start date & -1 \\
+            Budget & -1 \\
+            Category & 3.5 \\
+            Duration & 7 \\
+            Museum & true \\
+            Palace & true \\
+            \bottomrule
+        \end{tabular}
+    \end{subtable}
+\end{table}

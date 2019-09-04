@@ -1,0 +1,382 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Masters/Doctoral Thesis 
+% LaTeX Template
+% Version 2.4 (22/11/16)
+%
+% This template has been downloaded from:
+% http://www.LaTeXTemplates.com
+%
+% Version 2.x major modifications by:
+% Vel (vel@latextemplates.com)
+%
+% This template is based on a template by:
+% Steve Gunn (http://users.ecs.soton.ac.uk/srg/softwaretools/document/templates/)
+% Sunil Patel (http://www.sunilpatel.co.uk/thesis-template/)
+%
+% Template license:
+% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass[
+    11pt, % The default document font size, options: 10pt, 11pt, 12pt
+    %oneside, % Two side (alternating margins) for binding by default, uncomment to switch to one side
+    english, % ngerman for German
+    onehalfspacing, % Single line spacing, alternatives: onehalfspacing or doublespacing
+    %draft, % Uncomment to enable draft mode (no pictures, no links, overfull hboxes indicated)
+    %nolistspacing, % If the document is onehalfspacing or doublespacing, uncomment this to set spacing in lists to single
+    liststotoc, % Uncomment to add the list of figures/tables/etc to the table of contents
+    %toctotoc, % Uncomment to add the main table of contents to the table of contents
+    parskip, % Uncomment to add space between paragraphs
+    nohyperref, % Uncomment to not load the hyperref package
+    headsepline, % Uncomment to get a line under the header
+    chapterinoneline, % Uncomment to place the chapter title next to the number on one line
+    consistentlayout, % Uncomment to change the layout of the declaration, abstract and acknowledgements pages to match the default layout
+]{MastersDoctoralThesis} % The class file specifying the document structure
+
+\usepackage[utf8]{inputenc} % Required for inputting international characters
+\usepackage[T1]{fontenc} % Output font encoding for international characters
+
+\usepackage{palatino} % Use the Palatino font by default
+
+\usepackage[backend=bibtex,style=ieee,natbib=true,block=space]{biblatex} % Use the bibtex backend with the authoryear citation style (which resembles APA)
+
+\addbibresource{ref.bib} % The filename of the bibliography
+
+\usepackage[autostyle=true]{csquotes} % Required to generate language-dependent quotes in the bibliography
+
+\usepackage{multirow}
+\usepackage{makecell}
+
+\usepackage[inline]{enumitem}
+\usepackage{array}
+
+\usepackage{rotating}
+
+\usepackage{lipsum}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{bbm}
+
+%\usepackage{mhchem}
+\usepackage{tensor}
+
+\usepackage{chngcntr}
+ 
+%remove chapter number
+%\counterwithout{figure}{chapter}
+%\counterwithout{table}{chapter}
+
+%\usepackage[table,xcdraw]{xcolor}
+%\usepackage{booktabs}
+\usepackage[linesnumbered,ruled,vlined]{algorithm2e}
+\usepackage{verbatim} 
+\usepackage{mathtools}
+%\usepackage{subfig}
+
+%%% ===== My packages =====
+\usepackage[utf8]{inputenc}
+\usepackage{listings}
+\usepackage{amsmath}
+\usepackage{physics}
+\usepackage{graphicx}
+\usepackage{bm}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage[colorlinks=true,linkcolor=blue]{hyperref}
+
+%----------------------------------------------------------------------------------------
+%	MARGIN SETTINGS
+%----------------------------------------------------------------------------------------
+
+\geometry{
+	paper=a4paper, % Change to letterpaper for US letter
+	inner=2.5cm, % Inner margin
+	outer=3.8cm, % Outer margin
+	bindingoffset=.5cm, % Binding offset
+	top=1.5cm, % Top margin
+	bottom=1.5cm, % Bottom margin
+	%showframe, % Uncomment to show how the type block is set on the page
+}
+
+%----------------------------------------------------------------------------------------
+%	THESIS INFORMATION
+%----------------------------------------------------------------------------------------
+
+\thesistitle{Embedding Memory into Advanced Dialogue Management} % Your thesis title, this is used in the title and abstract, print it elsewhere with \ttitle
+
+\author{Chia-An \textsc{YU}} % Your name, this is used in the title page and abstract, print it elsewhere with \authorname
+
+\supervisor{Claudiu \textsc{Musat}} % Your supervisor's name, this is used in the title page, print it elsewhere with \supname
+
+\professor{Martin \textsc{Jaggi}} % Your professor's name, this is used in the title page, print it elsewhere with \profname
+
+\examiner{} % Your examiner's name, this is not currently used anywhere in the template, print it elsewhere with \examname
+
+% \degree{Master in Computer Science} % Your degree name, this is used in the title page and abstract, print it elsewhere with \degreename
+
+% \addresses{} % Your address, this is not currently used anywhere in the template, print it elsewhere with \addressname
+
+% \subject{Subject} % Your subject area, this is not currently used anywhere in the template, print it elsewhere with \subjectname
+
+% \keywords{Keyword} % Keywords for your thesis, this is not currently used anywhere in the template, print it elsewhere with \keywordnames
+
+\university{\href{https://www.epfl.ch/index.en.html}{École Polytechnique Fédérale de Lausanne}} % Your university's name and URL, this is used in the title page and abstract, print it elsewhere with \univname
+
+\department{\href{https://www.epfl.ch/schools/ic}{School of Computer and Communication Sciences}} % Your department's name and URL, this is used in the title page and abstract, print it elsewhere with \deptname
+
+\group{\href{https://www.swisscom.ch/}{Swisscom Digital Lab}} % Your research group's name and URL, this is used in the title page, print it elsewhere with \groupname
+
+\faculty{\href{https://www.epfl.ch/labs/mlo/}{Machine Learning and Optimization Laboratory}} % Your faculty's name and URL, this is used in the title page and abstract, print it elsewhere with \facname
+
+%\AtBeginDocument{
+%\hypersetup{pdftitle=\ttitle} % Set the PDF's title to your title
+%\hypersetup{pdfauthor=\authorname} % Set the PDF's author to your name
+%\hypersetup{pdfkeywords=\keywordnames} % Set the PDF's keywords to your keywords
+%}
+
+\begin{document}
+
+
+\frontmatter % Use roman page numbering style (i, ii, iii, iv...) for the pre-content pages
+
+\pagestyle{plain} % Default to the plain heading style until the thesis style is called for the body content
+
+%----------------------------------------------------------------------------------------
+%	TITLE PAGE
+%----------------------------------------------------------------------------------------
+
+\begin{titlepage}
+\begin{center}
+
+\vspace*{-2cm}
+\begin{minipage}[c]{0.4\textwidth}
+    \begin{flushleft}
+        \hspace*{0.4cm}
+        \includegraphics[height=2.0cm]{figures/EPFL_Logo.png}
+    \end{flushleft}
+\end{minipage}
+\hfill
+\begin{minipage}[c]{0.4\textwidth}
+    \begin{flushright}
+        \includegraphics[height=2.0cm]{figures/Swisscom_Horizontal_RGB_Colour_Navy.png}
+        \hspace*{0.4cm}
+    \end{flushright}
+\end{minipage}
+% \vspace*{5.0cm}
+\vfill
+
+% \vspace*{.06\textheight}
+% {\scshape \Large \univname\par}\vspace{1.5cm} % University name
+% \textsc{\Large Master Thesis}\\[0.5cm] % Thesis type
+
+\HRule \\[0.4cm] % Horizontal line
+{\huge \bfseries \ttitle\par}\vspace{0.4cm} % Thesis title
+\HRule \\[1.5cm] % Horizontal line
+ 
+\textsc{\Large Master Thesis}\\[0.1cm] % Thesis type
+{\small Spring Semester 2019}\\
+\vfill
+ 
+{\large\emph{Author: }\authorname}\\[0.5cm]
+{\small \facname}\\[0.1cm]
+{\small\deptname} \\[0.1cm]
+{\small \univname} \\[0.1cm]
+{\small \groupname}\\[0.1cm]
+% \href{https://www.epfl.ch/index.en.html}{EPFL} \\[1cm]
+\vfill
+ 
+ 
+{\large\emph{Professor: } \profname}\\[0.5cm]
+% \vspace{0.5cm}
+{\large\emph{Supervisor: } \supname}\\
+
+\vfill
+% \begin{minipage}[t]{0.45\textwidth}
+% \begin{flushleft} \large
+% \emph{Author:}\\
+% \authorname\\
+% % ~\\
+% % ~\\
+% % \vspace{1cm}
+% % \deptname \\
+% % \href{https://www.epfl.ch/index.en.html}{EPFL} \\[1cm]
+% \end{flushleft}
+% \end{minipage}
+% \begin{minipage}[t]{0.45\textwidth}
+% \begin{flushright} \large
+% \emph{Supervisor:} \\
+% \supname \\
+% \vspace{0.5cm}
+% \emph{Assistant:} \\
+% \profname \\
+% % \vspace{0.5cm}
+% % \groupname\\
+% \end{flushright}
+% \end{minipage}\\[1.5cm]
+ 
+%\vfill
+
+% \large \textit{A thesis submitted in fulfillment of the requirements\\ for the degree of \degreename}\\[0.3cm] % University requirement text
+% \textit{in the}\\[0.4cm]
+
+ % Research group name and department name
+ 
+\vfill
+
+%{\large \today}\\[1cm] % Date
+{\large August 15, 2019}\\[1cm] % Date
+
+% \vfill
+
+% \includegraphics[width=3cm]{Figures/SDSC_logo.png}\\
+% \hspace{0.5cm}\includegraphics[width=3cm]{EPFL_Logo.png} % Logo
+
+\end{center}
+\end{titlepage}
+
+
+%----------------------------------------------------------------------------------------
+%	DECLARATION PAGE
+%----------------------------------------------------------------------------------------
+
+% \begin{declaration}
+% \addchaptertocentry{\authorshipname} % Add the declaration to the table of contents
+% \noindent I, \authorname, declare that this thesis titled, \enquote{\ttitle} and the work presented in it are my own. I confirm that:
+
+% \begin{itemize} 
+% \item This work was done wholly or mainly while in candidature for a research degree at this University.
+% \item Where any part of this thesis has previously been submitted for a degree or any other qualification at this University or any other institution, this has been clearly stated.
+% \item Where I have consulted the published work of others, this is always clearly attributed.
+% \item Where I have quoted from the work of others, the source is always given. With the exception of such quotations, this thesis is entirely my own work.
+% \item I have acknowledged all main sources of help.
+% \item Where the thesis is based on work done by myself jointly with others, I have made clear exactly what was done by others and what I have contributed myself.\\
+% \end{itemize}
+ 
+% \noindent Signed:\\
+% \rule[0.5em]{25em}{0.5pt} % This prints a line for the signature
+ 
+% \noindent Date:\\
+% \rule[0.5em]{25em}{0.5pt} % This prints a line to write the date
+% \end{declaration}
+
+\cleardoublepage
+
+%----------------------------------------------------------------------------------------
+%	QUOTATION PAGE
+%----------------------------------------------------------------------------------------
+
+% \vspace*{0.2\textheight}
+
+% \noindent\enquote{\itshape Thanks to my solid academic training, today I can write hundreds of words on virtually any topic without possessing a shred of information, which is how I got a good job in journalism.}\bigbreak
+
+% \hfill Dave Barry
+
+%----------------------------------------------------------------------------------------
+%	ACKNOWLEDGEMENTS
+%----------------------------------------------------------------------------------------
+
+%\include{Chapters/Acknowledgements_main}
+
+%----------------------------------------------------------------------------------------
+%	ABSTRACT PAGE
+%----------------------------------------------------------------------------------------
+
+\include{abstract}
+
+%----------------------------------------------------------------------------------------
+%	LIST OF CONTENTS/FIGURES/TABLES PAGES
+%----------------------------------------------------------------------------------------
+
+\tableofcontents % Prints the main table of contents
+
+\listoffigures % Prints the list of figures
+
+\listoftables % Prints the list of tables
+
+%----------------------------------------------------------------------------------------
+%	ABBREVIATIONS
+%----------------------------------------------------------------------------------------
+
+%\begin{abbreviations}{ll} % Include a list of abbreviations (a table of two columns)
+
+%\textbf{LAH} & \textbf{L}ist \textbf{A}bbreviations \textbf{H}ere\\ 
+%\textbf{WSF} & \textbf{W}hat (it) \textbf{S}tands \textbf{F}or\\
+
+%\end{abbreviations}
+
+%----------------------------------------------------------------------------------------
+%	PHYSICAL CONSTANTS/OTHER DEFINITIONS
+%----------------------------------------------------------------------------------------
+
+% \begin{constants}{lr@{${}={}$}l} % The list of physical constants is a three column table
+
+% % The \SI{}{} command is provided by the siunitx package, see its documentation for instructions on how to use it
+
+% Speed of Light & $c_{0}$ & \SI{2.99792458e8}{\meter\per\second} (exact)\\
+% %Constant Name & $Symbol$ & $Constant Value$ with units\\
+
+% \end{constants}
+
+%----------------------------------------------------------------------------------------
+%	SYMBOLS
+%----------------------------------------------------------------------------------------
+
+% \begin{symbols}{lll} % Include a list of Symbols (a three column table)
+
+% $a$ & distance & \si{\meter} \\
+% $P$ & power & \si{\watt} (\si{\joule\per\second}) \\
+% %Symbol & Name & Unit \\
+
+% \addlinespace % Gap to separate the Roman symbols from the Greek
+
+% $\omega$ & angular frequency & \si{\radian} \\
+
+% \end{symbols}
+
+%----------------------------------------------------------------------------------------
+%	DEDICATION
+%----------------------------------------------------------------------------------------
+
+%\dedicatory{For/Dedicated to/To my\ldots} 
+
+%----------------------------------------------------------------------------------------
+%	THESIS CONTENT - CHAPTERS
+%----------------------------------------------------------------------------------------
+
+\mainmatter % Begin numeric (1,2,3...) page numbering
+
+\pagestyle{thesis} % Return the page headers back to the "thesis" style
+
+% Include the chapters of the thesis as separate files from the Chapters folder
+% Uncomment the lines as you write the chapters
+
+\include{main-content}
+
+%----------------------------------------------------------------------------------------
+%	THESIS CONTENT - APPENDICES
+%----------------------------------------------------------------------------------------
+
+\appendix % Cue to tell LaTeX that the following "chapters" are Appendices
+
+% Include the appendices of the thesis as separate files from the Appendices folder
+% Uncomment the lines as you write the Appendices
+
+%\include{Appendices/AppendixA}
+
+%----------------------------------------------------------------------------------------
+%	BIBLIOGRAPHY
+%----------------------------------------------------------------------------------------
+
+\printbibliography[heading=bibintoc]
+
+%----------------------------------------------------------------------------------------
+
+\end{document}  
