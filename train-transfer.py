@@ -23,7 +23,6 @@ from utils.parse_frames import load_dictionaries as frames_load_dicts, \
 from utils.parse_multiwoz import load_dictionaries as multiwoz_load_dicts, \
                                  MultiwozDataset
 
-from model.maluuba import Model
 from model.attention import Model as AttentionModel
 
 
@@ -178,9 +177,7 @@ def train(dicts_config,
             args['n_slots'] = len(slot_to_index) + 1
             args['n_tris'] = len(tri_to_index) + 1
 
-            if name == 'Model':
-                model, code = init_model(Model, **args)
-            elif name == 'AttentionModel':
+            if name == 'AttentionModel':
                 # NOTE: remove this when the device is set during runtime.
                 args['device'] = device
 

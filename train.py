@@ -19,7 +19,6 @@ from utils.parse_frames import load_dictionaries as frames_load_dicts, \
 from utils.parse_multiwoz import load_dictionaries as multiwoz_load_dicts, \
                                  MultiwozDataset
 
-from model.maluuba import Model
 from model.attention import Model as AttentionModel
 
 
@@ -175,9 +174,7 @@ def train(dicts_config,
             args['n_slots'] = len(slot_to_index) + 1
             args['n_tris'] = len(tri_to_index) + 1
 
-            if name == 'Model':
-                model, code = init_model(Model, **args)
-            elif name == 'AttentionModel':
+            if name == 'AttentionModel':
                 if args['embed_type'].startswith('bert') and \
                    args['bert_embedding'] is not None:
                     bert_embedding_file = args['embed_type'] + '-' + \
@@ -482,7 +479,9 @@ def main():
     n_runs = 5
 
     dry_run = False
+    dry_run = True
     device = 'cuda:0'
+    device = 'cpu'
     # tokenizer = 'trigram'
     tokenizer = 'bert-base-uncased'
     print('dry run = {}'.format(dry_run))
