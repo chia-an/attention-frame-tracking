@@ -15,11 +15,11 @@ $ python3 -c "import parse_multiwoz as m; m.create_dictionaries()"
 ```
 $ python3 -c "import parse_frames as m; m.split_dataset()"
 ```
-4. In the directory `./utils`, call `generate_mixed_dataset()` in `utils/mix_multiwoz.py`. Comment / uncomment different parts to change the setting of generation.
+4. Move the synthetic datasets used in the project from the directory `./synthetic` to `../data/MULTIWOZ2 2`. If you want to generate your own dataset, in the directory `./utils`, call `generate_mixed_dataset()` in `utils/mix_multiwoz.py`. Comment / uncomment different parts to change the setting of generation.
 ```
 $ python3 -c "import mix_multiwoz as m; m.generate_mixed_dataset()"
 ```
-5. In the directory `./utils`, call `split_dataset(DATASET_NAME)` in `utils/mix_multiwoz.py` to split the generated synthetic dataset.
+5. In the directory `./utils`, call `split_dataset(DATASET_NAME)` in `utils/mix_multiwoz.py` to split the synthetic dataset.
 ```
 $ python3 -c "import mix_multiwoz as m; m.split_dataset(DATASET_NAME)"
 ```
