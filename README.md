@@ -1,5 +1,7 @@
 # Dialogue frame tracking with attention
 
+This repository contains the code for the project **Embedding Memory into Advanced Dialogue Management**. Follow the instructions below to reproduce experimental results. Please look at the [report](https://github.com/chia-an/attention-frame-tracking/blob/master/report/report.pdf) for more details.
+
 ## Dependency
 - PyTorch 1.2.0
 - Other dependencies are in `requirements.txt`
